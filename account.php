@@ -115,70 +115,51 @@ while ($wishlistRow = $wishlist->fetch_assoc()){
 
 <p class='lead'>Cart</p>
 				
-				<div class="container-fluid">
+<div class="container-fluid">
 				
-				<?php
-$sql="SELECT * FROM cart WHERE userID =".$_SESSION['user'];
-$query= mysqli_query($conn,$sql);
-$count = mysqli_num_rows($query);
-$colum = 1;
+<?php
+
+$cartStatement = $conn->prepare("SELECT * FROM cart WHERE userId= ?");
+$cartStatement->bind_param("i",$_SESSION['user']);
+$cartStatement->execute();
+
+$cart = $cartStatement->get_result();
 $total = 0.00;
-if($count == 0){
-      $output = "Your cart is Empty!";
-		print ("$output");
-    }else{
-		      while ($row = mysqli_fetch_array($query)) {
-$itemdata= mysqli_query($conn,"SELECT * FROM items WHERE itemID={$row['itemID']}");
-				while($row2 = mysqli_fetch_array($itemdata)){
-if ($colum == 1){						
-        echo("<div class='row'>
-	<div class='col-sm-8 col-lg-8 col-md-8'>		
-				<div class='list-group'>
-				<a href='#' class='list-group-item'>Item ID:{$row2['itemID']}</a>
-				<a href='#' class='list-group-item'>Item Name:{$row2['itemTitle']}</a>
-                <a href='#' class='list-group-item'>Price:£{$row2['itemPrice']}</a>
-				
-				</div>
 
-			
-</div>
-				
-					
-				<div class='col-sm-4 col-lg-4 col-md-4'>
-				
-							<img src='pic/{$row2['itemThumbnail']}' style='max-width:200px;margin:20px;'alt=''>
-				
-				
-				
-				
-				
-				
+if($cart->num_rows == 0){
+    $output = "Your cart is Empty!";
+	print ("$output");
+} else {
+    while ($cartRow = $cart->fetch_assoc()) {
+        $cartItem= mysqli_query($conn,"SELECT * FROM items WHERE itemID={$cartRow['itemID']}");
+	while($itemData = mysqli_fetch_array($cartItem)){
+            echo("
+                <div class='row'>
+                    <div class='col-sm-8 col-lg-8 col-md-8'>
+		    	<div class='list-group'>
+				<a href='#' class='list-group-item'>Item ID:{$itemData['itemID']}</a>
+				<a href='#' class='list-group-item'>Item Name:{$itemData['itemTitle']}</a>
+				<a href='#' class='list-group-item'>Price:£{$itemData['itemPrice']}</a>
+			</div>
+		     </div>
+		     <div class='col-sm-4 col-lg-4 col-md-4'>
+		     	<img src='pic/{$itemData['itemThumbnail']}' style='max-width:200px;margin:20px;'alt=''>
 			<form action='' method='get'>
-							<button name='remove' value='{$row['itemID']}' style='margin:20px;'>Remove</button>
-				</form>
-				
-				
-				
+				<button name='remove' value='{$cartRow['itemID']}' style='margin:20px;'>Remove</button>
+			</form>
+                    </div>
                 </div>
-				
-				");
-$total += $row2['itemPrice'];
-
+            ");        
+            $total += $itemData['itemPrice'];
+	}
+    }
+	$total = number_format($total, 2);
 }
-			}
-			$total = number_format($total, 2);
-			  }
-}	
 ?>		
-
+	
 </div>
 <div class='row'>
-
-				<a href='' class='list-group-item'>Total: £<?php echo "$total" ?>	<?php include "pay.php" ?></a>
- 
-
-</a>
-				
+<a href='' class='list-group-item'>Total: £<?php echo "$total" ?><?php include "pay.php" ?></a></a>			
 </div>
             </div>
 </div>
@@ -197,14 +178,9 @@ $total += $row2['itemPrice'];
             </div>
         </footer>
 
+    </div>    
     </div>
-
-    
     </div>
-    
-    </div>
-
-    
 </body>
 </html>
  
