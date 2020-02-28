@@ -27,36 +27,35 @@ echo("<script>window.location('account.php')</script>");
 ?>
 
 <?php
-if(isset($_POST['checkout']))
-{
+
+    if(isset($_POST['checkout']) )
+    {
     
-$statement = $conn->prepare("INSERT INTO `orders`(`orderID`, `userID`) VALUES ('',?)");
-$statement->bind_param("i", $_SESSION['user']); 
-$statement->execute();
-$insertID = $conn->insert_id;
-
-$statement = $conn->prepare("SELECT * FROM cart WHERE userID = ?");
-$statement->bind_param("i", $_SESSION['user']);
-$statement->execute();
-
-$userCart = $statement->get_result();
-
-    while ($row = $userCart->fetch_assoc()) {
-        $insertStatement = $conn->prepare("INSERT INTO `orderdetail`(`orderID`, `selectionID`) VALUES ($insertID,{$row['itemID']})");
-        $insertStatement->execute();
+        $statement = $conn->prepare("SELECT * FROM cart WHERE userID = ?");
+        $statement->bind_param("i", $_SESSION['user']);
+        $statement->execute();
+        $userCart = $statement->get_result();
+        
+        if($userCart->num_rows > 0){
+            $statement = $conn->prepare("INSERT INTO `orders`(`orderID`, `userID`) VALUES ('',?)");
+            $statement->bind_param("i", $_SESSION['user']); 
+            $statement->execute();
+            $insertID = $conn->insert_id;
+        
+            while ($row = $userCart->fetch_assoc()) {
+                $insertStatement = $conn->prepare("INSERT INTO `orderdetail`(`orderID`, `selectionID`) VALUES ($insertID,{$row['itemID']})");
+                $insertStatement->execute();
+            }
+            
+        $emptyCart = $conn->prepare("DELETE FROM cart where userID = ?");
+        $emptyCart->bind_param("i", $_SESSION['user']);
+        $emptyCart->execute();
+        }
     }
-    
-$emptyCart = $conn->prepare("DELETE FROM cart where userID = ?");
-$emptyCart->bind_param("i", $_SESSION['user']);
-$emptyCart->execute();
-}
-	
-	
-	
-	
-	
-include_once 'usercheck.php';
-include_once 'navbar.php';
+    	
+    	
+    include_once 'usercheck.php';
+    include_once 'navbar.php';
 ?>
 
 
