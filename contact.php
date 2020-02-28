@@ -11,17 +11,10 @@
  
 ?>
  <div class="container-fluid" style='margin-right:10px;margin-left:10px;margin-top:60px;'>
-   
-
-        <div class="row">
-
-
-            
-
+    <div class="row">
             <div class="col-md-12">
 				<div class="row">
-				<p class="lead">Contact us by Email!</p>
-				
+				<p class="lead">Contact us by Email!</p>		
 <!-- Contact Form - START -->
 <div class="container">
     <div class="row">
@@ -109,12 +102,7 @@
 				<p style="text-align:center;">Opening hours: </p>
 				<p style="text-align:center;">Monday-Friday:10am-6pm gmt</p>
 				<p style="text-align:center;">Saturday & Sunday:11am-3pm gmt</p>
-				</div>
-				
-                
-                
-
-                    
+				</div>        
 </div>
     <!-- /.container -->
 <?php include 'footer.php'; ob_end_flush(); ?>
