@@ -85,22 +85,24 @@ echo("<script>window.location('account.php')</script>");
 				<p class="lead">Wishlist</p>
 <?php 
 
-$sql2="SELECT * FROM wishlist WHERE userID =".$_SESSION['user'];
-$query2= mysqli_query($conn,$sql2);
-while ($row3 = mysqli_fetch_array($query2)){
-$itemdata2= mysqli_query($conn,"SELECT * FROM items WHERE itemID={$row3['itemID']}");
-	while($row4 = mysqli_fetch_array($itemdata2)){
+$wishStatement = $conn->prepare("SELECT * FROM wishlist WHERE userId= ?");
+$wishStatement->bind_param("i",$_SESSION['user']);
+$wishStatement->execute();
+
+$wishlist = $wishStatement->get_result();
+
+while ($wishlistRow = $wishlist->fetch_assoc()){
+    
+    $wishlistItems= mysqli_query($conn,"SELECT * FROM items WHERE itemID={$wishlistRow['itemID']}");
+	while($itemData = mysqli_fetch_array($wishlistItems)){
 	echo("
-				
 					<div class='list-group-item'>
-					<p><img src='pic/{$row4['itemThumbnail']}' style='max-width:50px;'/> {$row4['itemTitle']}</p>
-					<p>£{$row4['itemPrice']}</p>
+					<p><img src='pic/{$itemData['itemThumbnail']}' style='max-width:50px;'/> {$itemData['itemTitle']}</p>
+					<p>£{$itemData['itemPrice']}</p>
 					
 					</div>
 				");
-	
 	}
-
 }
 
 ?>
