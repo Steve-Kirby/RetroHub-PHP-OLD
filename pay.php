@@ -137,10 +137,11 @@ function paypal_encrypt($hash)
 //$deadcart = mysqli_query($conn,$cartempty);
 ?>
 
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" >
+<form action="" method="post" >
 <input type="hidden" name="cmd" value="_s-xclick">
 <input type="hidden" name="encrypted" value="
 <?PHP echo $encrypted; ?>">
+<input type="hidden" name="checkout" value="true">
 <input type="submit" value="Checkout with PayPal!">
 </form>
 </BODY>
