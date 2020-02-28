@@ -16,10 +16,11 @@ $userRow = $statement->get_result();
 
 if(isset($_GET['remove']))
 {
-$userId = $_SESSION['user'];
-$removeItem = $_GET['remove'];	
-$removes ="DELETE FROM `cart` WHERE `itemID` = '$removeItem' and `userID` = '$userId'";
-$perform = $conn->query($removes);
+//Now Safer	
+$statement = $conn->prepare("DELETE FROM `cart` WHERE `itemID` = ? and `userID` = ?");
+$statement->bind_param("ii",$_GET['remove'], $_SESSION['user']);
+$statement->execute();
+	
 echo("<script>window.location('account.php')</script>");
 
 }
@@ -28,19 +29,26 @@ echo("<script>window.location('account.php')</script>");
 <?php
 if(isset($_POST['checkout']))
 {
-$useid = $_SESSION['user'];
-$neworder ="INSERT INTO `orders`(`orderID`, `userID`) VALUES ('','$useid')";
-$performorder = $conn->query($neworder);
-$sql="SELECT * FROM cart WHERE userID =".$_SESSION['user'];
-$query= mysqli_query($conn,$sql);
-while ($row = mysqli_fetch_array($query)) {
-				$querys= "INSERT INTO `orderdetail`(`orderID`, `selectionID`) VALUES (LAST_INSERT_ID(),{$row['itemID']})";
-				  $performit = $conn->query($querys);
-				    echo("testing");
-				}
+    
+$statement = $conn->prepare("INSERT INTO `orders`(`orderID`, `userID`) VALUES ('',?)");
+$statement->bind_param("i", $_SESSION['user']); 
+$statement->execute();
+$insertID = $conn->insert_id;
 
-$cartempty = "DELETE FROM cart where userID = {$useid}";
-$deadcart = mysqli_query($conn,$cartempty);
+$statement = $conn->prepare("SELECT * FROM cart WHERE userID = ?");
+$statement->bind_param("i", $_SESSION['user']);
+$statement->execute();
+
+$userCart = $statement->get_result();
+
+    while ($row = $userCart->fetch_assoc()) {
+        $insertStatement = $conn->prepare("INSERT INTO `orderdetail`(`orderID`, `selectionID`) VALUES ($insertID,{$row['itemID']})");
+        $insertStatement->execute();
+    }
+    
+$emptyCart = $conn->prepare("DELETE FROM cart where userID = ?");
+$emptyCart->bind_param("i", $_SESSION['user']);
+$emptyCart->execute();
 }
 	
 	
