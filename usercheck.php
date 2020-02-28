@@ -1,12 +1,18 @@
 <?php
 if(isset($_SESSION['user'])) {
-  $result = mysqli_query($conn,"SELECT * FROM users WHERE userId=".$_SESSION['user']);
-  $userRow = $result->fetch_assoc();
-  $guest = $userRow['userEmail'];
+    
+    $statement = $conn->prepare("SELECT * FROM users WHERE userId= ?");
+    $statement->bind_param("i",$_SESSION['user']);
+    $statement->execute();
+    $result = $statement->get_result();
+    $userRow = $result->fetch_assoc();
+    
+    $guest = $userRow['userEmail'];
 } else {
-  $guest = "Guest";
+    $guest = "Guest";
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,3 +36,4 @@ if(isset($_SESSION['user'])) {
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </head>
+
