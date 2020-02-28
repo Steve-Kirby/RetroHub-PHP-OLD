@@ -3,9 +3,12 @@ ob_start();
  session_start();
  require_once 'dbConnect.php';
 
+//Now Safer
+$statement = $conn->prepare("SELECT * FROM users WHERE userId= ?");
+$statement->bind_param("i",$_SESSION['user']);
+$statement->execute();
 
-$res = mysqli_query($conn,"SELECT * FROM users WHERE userId=".$_SESSION['user']);
-$userRow = $res->fetch_assoc();
+$userRow = $statement->get_result();
 
 ?>
 <?php
